@@ -1,10 +1,73 @@
 <script>
 	export let segment;
+
+	import { goto, stores } from "@sapper/app";
+	import { post } from "utils.js";
+
+	const { session } = stores();
+
+	async function logout() {
+		try {
+			await post("auth/logout"); // сервер гасит cookie/сессию
+		} finally {
+			// мгновенно обновляем UI на клиенте
+			if (session && session.set) {
+				session.set({ user: null });
+			} else {
+				// fallback (тоже сработает)
+				$session.user = null;
+			}
+			goto("/");
+		}
+	}
 </script>
+
+<nav>
+	<ul>
+		{#if $session.user}
+			<li>
+				<a href="/" rel="home">Home</a>
+			</li>
+			<li>
+				<a
+					href="/overview"
+					rel="overview"
+					on:click|preventDefault={() => goto("/overview")}
+					>Overview</a
+				>
+			</li>
+			<li>
+				<a
+					rel="nofollow"
+					href="/logout"
+					on:click|preventDefault={logout}
+					on:click|preventDefault={() => goto("/")}
+				>
+					Log out ({$session.user.username})
+				</a>
+			</li>
+		{:else}
+			<li>
+				<a
+					rel="prefetch"
+					aria-current={segment === "login" ? "page" : undefined}
+					href="/login">Log in</a
+				>
+			</li>
+			<li>
+				<a
+					rel="prefetch"
+					aria-current={segment === "register" ? "page" : undefined}
+					href="/register">Register</a
+				>
+			</li>
+		{/if}
+	</ul>
+</nav>
 
 <style>
 	nav {
-		border-bottom: 1px solid rgba(255,62,0,0.1);
+		border-bottom: 1px solid rgba(255, 62, 0, 0.1);
 		font-weight: 300;
 		padding: 0 1em;
 	}
@@ -16,7 +79,7 @@
 
 	/* clearfix */
 	ul::after {
-		content: '';
+		content: "";
 		display: block;
 		clear: both;
 	}
@@ -33,10 +96,10 @@
 
 	[aria-current]::after {
 		position: absolute;
-		content: '';
+		content: "";
 		width: calc(100% - 1em);
 		height: 2px;
-		background-color: rgb(255,62,0);
+		background-color: rgb(255, 62, 0);
 		display: block;
 		bottom: -1px;
 	}
@@ -47,14 +110,3 @@
 		display: block;
 	}
 </style>
-
-<nav>
-	<ul>
-		<li><a aria-current="{segment === undefined ? 'page' : undefined}" href=".">home</a></li>
-		<li><a aria-current="{segment === 'about' ? 'page' : undefined}" href="about">about</a></li>
-
-		<!-- for the blog link, we're using rel=prefetch so that Sapper prefetches
-		     the blog data when we hover over the link or tap it on a touchscreen -->
-		<li><a rel=prefetch aria-current="{segment === 'blog' ? 'page' : undefined}" href="blog">blog</a></li>
-	</ul>
-</nav>
