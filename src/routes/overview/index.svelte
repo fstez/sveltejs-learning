@@ -8,10 +8,7 @@
 </script>
 
 <script>
-    import * as sapper from "@sapper/app";
     import { post } from "utils.js";
-
-    const { session } = sapper.stores();
 
     async function getMyData() {
         return await post(`auth/getMyData`).then((r) => {
@@ -39,7 +36,6 @@
         loading...
     {:then my}
         <section>
-            <h1 class="text-center">Overview</h1>
             <p style="font-size: xx-large">{my.name}</p>
         </section>
         <section>
@@ -98,15 +94,5 @@
 <style>
     section {
         margin: 1em 0;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    th,
-    td {
-        padding: 0.5em;
-        text-align: left;
-        border: 1px solid #ccc;
     }
 </style>

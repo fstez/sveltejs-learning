@@ -1,6 +1,9 @@
 // src/server.js
 import polka from 'polka';
 import compression from 'compression';
+
+import session from 'express-session';
+import sessionFileStore from 'session-file-store';
 import sirv from 'sirv';
 import * as sapper from '@sapper/server';
 import bodyParser from 'body-parser';
@@ -8,6 +11,8 @@ import cookieSession from 'cookie-session';
 
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
+
+const FileStore = sessionFileStore(session);
 
 polka()
 	.use(
